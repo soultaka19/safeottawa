@@ -19,8 +19,11 @@
   }
 }
 
-body {
-  background: var(--background);
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #020617;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
