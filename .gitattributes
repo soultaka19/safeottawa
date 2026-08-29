@@ -1,0 +1,27 @@
+# Fins de ligne : LF dans le dépôt, natives à l'extraction (Windows = CRLF)
+* text=auto
+
+# Scripts exécutés sous Linux / dans des conteneurs : toujours LF
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.Dockerfile text eol=lf
+
+# Fichiers binaires
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg text
+*.pdf binary
+*.docx binary
+*.pptx binary
+*.xlsx binary
+*.zip binary
+*.mp4 binary
+*.mp3 binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
