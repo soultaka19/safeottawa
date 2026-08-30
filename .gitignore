@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...mais le modele, lui, doit etre versionne : il ne contient aucune valeur.
+!.env.example
 
 # vercel
 .vercel
