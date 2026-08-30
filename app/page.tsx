@@ -89,6 +89,10 @@ export default function Home() {
   async function loadReports() {
     if (reportsLoaded) return
     const res = await fetch('/api/reports')
+    if (!res.ok) {
+      setError('Signalements indisponibles')
+      return
+    }
     const data: Report[] = await res.json()
     setReports(data)
     setReportsLoaded(true)
@@ -152,6 +156,13 @@ export default function Home() {
           description: reportDesc,
         }),
       })
+      if (!res.ok) {
+        // L'API renvoie { error } en 400 comme en 500 : on montre sa raison
+        // plutot qu'un message generique.
+        const detail = await res.json().catch(() => null)
+        setError(detail?.error ?? 'Erreur lors du signalement')
+        return
+      }
       const newReport: Report = await res.json()
       setReports(prev => [newReport, ...prev])
       setReportDesc('')

@@ -150,7 +150,9 @@ export async function fetchRoutes(
   mode: 'foot' | 'bike'
 ): Promise<RouteResult[]> {
   const url =
-    `http://router.project-osrm.org/route/v1/${mode}/` +
+    // HTTPS obligatoire : cet appel part du navigateur, et une page servie en
+    // HTTPS voit toute requete http:// bloquee comme contenu mixte.
+    `https://router.project-osrm.org/route/v1/${mode}/` +
     `${origin[1]},${origin[0]};${dest[1]},${dest[0]}` +
     `?alternatives=3&geometries=geojson&overview=full`
 
