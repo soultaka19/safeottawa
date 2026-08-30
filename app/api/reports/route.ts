@@ -15,7 +15,21 @@ import { neon } from '@neondatabase/serverless'
  * pool de connexions à gérer, ce qui convient à une fonction sans état.
  */
 
-const sql = neon(process.env.DATABASE_URL!)
+/**
+ * Client instancie PARESSEUSEMENT, jamais au chargement du module.
+ *
+ * `neon()` leve « No database connection string was provided » quand la
+ * variable manque. Appele au niveau module, cela faisait echouer le BUILD
+ * Vercel — a l'etape « Collecting page data », qui charge chaque route — alors
+ * que DATABASE_URL est une variable d'EXECUTION. Une variable d'environnement
+ * absente ne doit jamais empecher la carte de se deployer : seule la route des
+ * signalements doit en souffrir, et le dire clairement.
+ */
+function client() {
+  const url = process.env.DATABASE_URL
+  if (!url) throw new Error('DATABASE_URL absente')
+  return neon(url)
+}
 
 /** Contrat rendu au client : `timestamp`, comme avant la migration. */
 type ReportOut = {
@@ -84,6 +98,7 @@ function valider(corps: unknown): { ok: true; valeur: Omit<ReportOut, 'id' | 'ti
 
 export async function GET() {
   try {
+    const sql = client()
     const lignes = (await sql`
       SELECT id, lat, lon, type, description, created_at
       FROM reports
@@ -111,6 +126,7 @@ export async function POST(req: NextRequest) {
   if (!v.ok) return NextResponse.json({ error: v.message }, { status: 400 })
 
   try {
+    const sql = client()
     const [ligne] = (await sql`
       INSERT INTO reports (lat, lon, type, description)
       VALUES (${v.valeur.lat}, ${v.valeur.lon}, ${v.valeur.type}, ${v.valeur.description})
