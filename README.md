@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SafeOttawa
 
-## Getting Started
+**Calculer un itinéraire piéton ou cycliste sur le risque réel d'accident, pas seulement sur la distance.**
 
-First, run the development server:
+Lauréat du défi Sécurité routière, InnovaCode 2026.
+
+**Application en ligne : [safeottawa.soultaka.com](https://safeottawa.soultaka.com)**
+
+---
+
+## Le problème
+
+La Ville d'Ottawa publie ses données de collisions en libre accès. **94 406 incidents** y sont recensés, dont **3 482 impliquant un piéton ou un cycliste**.
+
+Aucune application de navigation n'utilise ces données. Elles vous disent comment aller plus vite ; aucune ne vous dit comment aller plus sûrement.
+
+## Ce que fait l'application
+
+**Une carte de chaleur du danger réel.** Les 94 406 collisions sont agrégées en **1 895 zones à risque**, pondérées par la gravité et la vulnérabilité de l'usager.
+
+**Trois itinéraires comparés, pas un seul.** Pour un même trajet, l'application calcule une route recommandée, une alternative et une route déconseillée, chacune avec son pourcentage de risque. Les trois restent affichées : on ne vous impose pas un choix, on vous montre l'écart.
+
+**Un seuil de tolérance ajustable en temps réel.** Un enfant et un cycliste aguerri n'ont pas la même tolérance au risque. Le curseur réévalue les recommandations sans recalculer les itinéraires, donc sans latence.
+
+**Le signalement de ce que les données ignorent.** Une plaque de verglas, une intersection sans signalisation : les usagers ajoutent sur la carte ce que les statistiques municipales ne connaissent pas encore.
+
+## Comment c'est construit
+
+Le traitement des données est fait en amont, en Python (`scripts/data_prep.py`) : les collisions brutes sont nettoyées, filtrées sur les usagers vulnérables, agrégées spatialement, puis exportées en JSON statique. L'application n'interroge donc jamais un jeu de 94 000 lignes à l'exécution.
+
+Le score de risque d'un itinéraire est calculé en échantillonnant sa géométrie et en mesurant l'exposition de chaque point aux zones à risque environnantes. Le routage s'appuie sur OSRM, le géocodage sur Nominatim, et les signalements communautaires sont stockés en PostgreSQL.
+
+## Pile technique
+
+`Next.js` · `React` · `TypeScript` · `Leaflet` et `leaflet.heat` · `PostgreSQL (Neon)` · `Python` pour la préparation des données · `OSRM` · `Nominatim` · `OpenStreetMap`
+
+## Lancer en local
 
 ```bash
+npm install
+cp .env.example .env.local   # renseigner la chaîne de connexion PostgreSQL
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+L'application démarre sur `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** : le problème, l'approche, les algorithmes, l'architecture et les limites connues.
+- **[DEPLOIEMENT.md](DEPLOIEMENT.md)** : la mise en production.
 
-## Learn More
+## Ce que l'application ne fait pas
 
-To learn more about Next.js, take a look at the following resources:
+Les données de collision sont un instantané du jeu publié par la Ville, pas un flux temps réel. Le score de risque est un indicateur relatif entre itinéraires, pas une probabilité d'accident. Les limites sont détaillées dans la documentation, et elles y sont énoncées avant les perspectives.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Souleymane Diallo · [soultaka.com](https://soultaka.com) · [linkedin.com/in/souleyman-dev](https://linkedin.com/in/souleyman-dev)
